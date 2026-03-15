@@ -15,7 +15,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "5000:5000"
+      - "3000:3000"
     environment:
       MONGO_URI: mongodb://admin:secret@mongodb:27017/chatdb?authSource=admin
     depends_on:
@@ -28,6 +28,18 @@ services:
     ports:
       - "5173:5173"
     depends_on:
+      - backend
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-proxy
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - frontend
       - backend
 
 volumes:

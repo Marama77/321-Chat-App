@@ -16,5 +16,5 @@ docker compose up -d --build
 
 ### Access ports
 - **Frontend:** [http://localhost:5173](http://localhost:5173) (React / Vite)
-- **Backend API:** [http://localhost:5000](http://localhost:5000) (Node.js / Express)
+- **Backend API:** [http://localhost:3000](http://localhost:3000) (Node.js / Express)
 - **Database:** `localhost:27017` (MongoDB)
