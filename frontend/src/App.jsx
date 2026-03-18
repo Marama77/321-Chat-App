@@ -1,20 +1,71 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import pinkImg from './assets/pinkscape.png'
 import './App.css'
 
-//Eingabefelder für neuen User und Passwort
+// Socket.io Verbindung
+import { io } from 'socket.io-client'
+const socket = io("http://localhost:3000");
+
+//Eingabefelder für bestehenden User und sein Passwort
+function InputUsername() {
+  return (
+      <label htmlFor="username">Benutzername:</label>
+  );
+}
+function InputPassword() {
+  return (
+      <label htmlFor="userpassword">Passwort:</label>
+  );
+}
 function NewUsername() {
   return (
-      <label htmlFor="username">Wählen Sie einen Benutzernamen:</label>
+      <label htmlFor="newusername">Benutzername:</label>
   );
 }
-function NewPassword() {
+function NewUserPassword() {
   return (
-      <label htmlFor="password">Wählen Sie ein Passwort:</label>
+      <label htmlFor="newuserpassword">Passwort (min. 8 Zeichen):</label>
   );
 }
+function RegisterForm() {
+  function HandleFormSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const newusername = form.elements.newusername.value;
+    const newuserpassword = form.elements.newuserpassword.value;
+
+    const userData = {
+      username: newusername,
+      password: newuserpassword,
+    };
+
+    console.log("JSON-Daten zum Senden:", userData);
+    socket.emit("new user", userData);
+
+
+  }
+
+
+  return (
+      <form onSubmit={HandleFormSubmit}>
+
+        <h3>Noch keinen Benutzernamen?</h3>
+        <h2>Geben Sie einen Benutzernamen und ein Passwort ein:</h2>
+
+        <NewUsername />
+        <input type="text" id="newusername" name="newusername" required />
+
+        <NewUserPassword />
+        <input type="password" id="newuserpassword" name="newuserpassword" minLength={8} required />
+
+        <input type="submit" value="Registrieren" />
+      </form>
+  );
+}
+
+
 
 function App() {
   const [count, setCount] = useState(0)
@@ -23,110 +74,27 @@ function App() {
       <>
         <section id="center">
           <div className="hero">
-            <img src={heroImg} className="base" width="170" height="179" alt=""/>
-            <img src={reactLogo} className="framework" alt="React logo"/>
-            <img src={viteLogo} className="vite" alt="Vite logo"/>
+
+
+            <img src={pinkImg} className="pink" width="200" alt="Pink logo"/>
           </div>
+
           <div>
-            <h1>Get started</h1>
-            <p>
-              Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-            </p>
+            <h1>321-Chat-App</h1>
+            <h2>Geben Sie Ihren Benutzernamen und Ihr Passwort ein:</h2>
           </div>
-          <NewUsername/>
+          <InputUsername/>
           <input type="text" id="username" name="username" required/>
-          <NewPassword/>
-          <input type="text" id="password" name="password" required/>
-          <button
-              className="counter"
-              onClick={() => setCount((count) => count + 1)}
-          >
-            Count is {count}
-          </button>
+          <InputPassword/>
+          <input type="password" id="userpassword" name="userpassword" minLength={8} required/>
+          <input type="submit" value="Anmelden"/>
+          <RegisterForm/>
+
+
+
         </section>
 
-        <div className="ticks"></div>
 
-        <section id="next-steps">
-          <div id="docs">
-            <svg className="icon" role="presentation" aria-hidden="true">
-              <use href="/icons.svg#documentation-icon"></use>
-            </svg>
-            <h2>Documentation</h2>
-            <p>Your questions, answered</p>
-            <ul>
-              <li>
-                <a href="https://vite.dev/" target="_blank">
-                  <img className="logo" src={viteLogo} alt="" />
-                  Explore Vite
-                </a>
-              </li>
-              <li>
-                <a href="https://react.dev/" target="_blank">
-                  <img className="button-icon" src={reactLogo} alt="" />
-                  Learn more
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div id="social">
-            <svg className="icon" role="presentation" aria-hidden="true">
-              <use href="/icons.svg#social-icon"></use>
-            </svg>
-            <h2>Connect with us</h2>
-            <p>Join the Vite community</p>
-            <ul>
-              <li>
-                <a href="https://github.com/vitejs/vite" target="_blank">
-                  <svg
-                      className="button-icon"
-                      role="presentation"
-                      aria-hidden="true"
-                  >
-                    <use href="/icons.svg#github-icon"></use>
-                  </svg>
-                  GitHub
-                </a>
-              </li>
-              <li>
-                <a href="https://chat.vite.dev/" target="_blank">
-                  <svg
-                      className="button-icon"
-                      role="presentation"
-                      aria-hidden="true"
-                  >
-                    <use href="/icons.svg#discord-icon"></use>
-                  </svg>
-                  Discord
-                </a>
-              </li>
-              <li>
-                <a href="https://x.com/vite_js" target="_blank">
-                  <svg
-                      className="button-icon"
-                      role="presentation"
-                      aria-hidden="true"
-                  >
-                    <use href="/icons.svg#x-icon"></use>
-                  </svg>
-                  X.com
-                </a>
-              </li>
-              <li>
-                <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                  <svg
-                      className="button-icon"
-                      role="presentation"
-                      aria-hidden="true"
-                  >
-                    <use href="/icons.svg#bluesky-icon"></use>
-                  </svg>
-                  Bluesky
-                </a>
-              </li>
-            </ul>
-          </div>
-        </section>
 
         <div className="ticks"></div>
         <section id="spacer"></section>
