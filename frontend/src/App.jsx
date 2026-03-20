@@ -1,12 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import pinkImg from './assets/pinkscape.png'
 import './App.css'
 
 // Socket.io Verbindung
-import { io } from 'socket.io-client'
-const socket = io("http://localhost:3000");
+import { socket } from './socket.js'
 
 //Eingabefelder für bestehenden User und sein Passwort
 function InputUsername() {
@@ -29,6 +28,8 @@ function NewUserPassword() {
       <label htmlFor="newuserpassword">Passwort (min. 8 Zeichen):</label>
   );
 }
+
+// für neuen Benutzer
 function RegisterForm() {
   function HandleFormSubmit(event) {
     event.preventDefault();
@@ -40,14 +41,27 @@ function RegisterForm() {
       username: newusername,
       password: newuserpassword,
     };
-
     console.log("JSON-Daten zum Senden:", userData);
-    socket.emit("new user", userData);
 
-
+    fetch("http://localhost:8080/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+    })
+        .then((res) => {
+            if (!res.ok) throw new Error("Register failed!");
+            return res.json();
+        })
+      .then((data) => {
+          console.log("Response from backend:", data);
+          alert("Register successful!");
+          form.reset();
+      })
+      .catch((err) => {
+          console.log(err);
+          alert("Register failed!");
+      });
   }
-
-
   return (
       <form onSubmit={HandleFormSubmit}>
 
@@ -65,20 +79,24 @@ function RegisterForm() {
   );
 }
 
-
-
 function App() {
-  const [count, setCount] = useState(0)
+    const [message, setMessage] = useState([]);
+
+    useEffect(() => {
+        socket.on("chat message", (msg) => {
+            setMessage(prev => [...prev, msg]);
+        });
+        return () => {
+            socket.off("chat message");
+        };
+    }, []);
 
   return (
       <>
         <section id="center">
           <div className="hero">
-
-
             <img src={pinkImg} className="pink" width="200" alt="Pink logo"/>
           </div>
-
           <div>
             <h1>321-Chat-App</h1>
             <h2>Geben Sie Ihren Benutzernamen und Ihr Passwort ein:</h2>
@@ -89,17 +107,10 @@ function App() {
           <input type="password" id="userpassword" name="userpassword" minLength={8} required/>
           <input type="submit" value="Anmelden"/>
           <RegisterForm/>
-
-
-
         </section>
-
-
-
         <div className="ticks"></div>
         <section id="spacer"></section>
       </>
   )
 }
-
 export default App
